@@ -33,7 +33,6 @@ always_ff @(posedge clk_i)
 		led_sweeping_digit <= led_sweeping_digit + 1;
 	end
 
-
 	
 always_ff @(posedge clk_i)
 	begin
@@ -163,10 +162,7 @@ always_ff @(posedge clk_i)
 						begin
 							digit <= 4'b1011;
 							led <= 7'h7B;	
-							
 						end
-						
-
 				endcase
 			end
 
@@ -232,9 +228,7 @@ always_ff @(posedge clk_i)
 						begin
 							digit <= 4'b1101;
 							led <= 7'h7B;				
-						end
-						
-						
+						end					
 				endcase
 			end
 
@@ -253,61 +247,55 @@ always_ff @(posedge clk_i)
 							led <= 7'h30;				
 						end
 						
-						4'b0010 : 
+						2 : 
 						begin
 							digit <= 4'b1011;
 							led <= 7'h6D;			
 						end
 						
-						2 : 
+						3 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h79;				
 						end
 						
-						3 : 
+						4 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h33;
 							
 						end
 						
-						4 : 
+						5 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h5B;				
 						end
 						
-						5 : 
+						6 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h5F;				
 						end
 						
-						6 : 
+						7 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h70;				
 						end
 						
-						7 : 
+						8 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h7F;				
 						end
 						
-						8 : 
+						9 : 
 						begin
 							digit <= 4'b1110;
 							led <= 7'h7B;				
 						end
-						
-						9 :   
-						begin
-							digit <= 4'b1110;
-							led <= 7'h7E;				
-						end
-						
+								
 				endcase
 			end
 	end
