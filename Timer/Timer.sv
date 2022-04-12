@@ -27,16 +27,18 @@ always_ff @(posedge clk_i)
 			end
 	end
 
-	
+
 always_ff @(posedge clk_i)
 	begin
 		led_sweeping_digit <= led_sweeping_digit + 1;
 	end
 
+
+
 	
 always_ff @(posedge clk_i)
 	begin
-		case (cnt_one_sec % 10)
+		case (cnt_one_sec % 10) //123x
 				0 : 
 				begin
 					digit <= 4'b0111;
@@ -100,9 +102,9 @@ always_ff @(posedge clk_i)
 
 		endcase
 
-		if(led_sweeping_digit[12:11] != 2'b00)
+		if(led_sweeping_digit[12:11] != 2'b00) 
 			begin
-				case ((cnt_one_sec % 100)/10)
+				case ((cnt_one_sec % 100)/10) //12x4
 						0 : 
 						begin
 							digit <= 4'b1011;
@@ -168,7 +170,7 @@ always_ff @(posedge clk_i)
 
 		if(led_sweeping_digit[14:13] != 2'b00)
 			begin
-				case ((cnt_one_sec % 1000)/100)
+				case ((cnt_one_sec % 1000)/100) //1x34
 						0 : 
 						begin
 							digit <= 4'b1101;
@@ -234,7 +236,7 @@ always_ff @(posedge clk_i)
 
 		if(led_sweeping_digit[16:15] != 2'b00)
 			begin
-				case (cnt_one_sec/1000)
+				case (cnt_one_sec/1000) //x234
 						0 : 
 						begin
 							digit <= 4'b1110;
