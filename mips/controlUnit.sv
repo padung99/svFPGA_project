@@ -2,7 +2,7 @@ module controlUnit (
 	input rst_i,
 	input clk_i,
 	input [5:0] op_i,
-	input funct_i,
+	input [5:0] funct_i,
 	output fetch_en_o,
 	output IorD_o,
 	output MemWrite_o,
@@ -78,7 +78,7 @@ always_comb
 		IRWrite = 'x;
 		ALUSrcB = 'x;
 		ALUOp = 'x;
-		PCWrite  = 'x;
+		PCWrite  = 1'b1;
 		PCSrc  = 'x;
 		fetch_en  = 'x;
 		Branch = 'x;
@@ -167,7 +167,6 @@ always_comb
 					ALUSrcA  = 1'b1;
 					ALUSrcB  = 2'b00;
 					ALUOp  = 2'b10;
-					//PCWrite  = 1'b0;
 					
 					next_state = R_TYPE_COMPLETION;
 				end

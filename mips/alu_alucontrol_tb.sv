@@ -13,7 +13,7 @@ logic [1:0] ALUop_i_tb;
 logic [5:0] funct_i_tb;
 
 alu inst_alu(
-	.clk_i(clk_tb),
+	//.clk_i(clk_tb),
 	.srcA_i(srcA_i_tb), //input
 	.srcB_i(srcB_i_tb),//input
 	.aluControl_i(aluControl_tb),

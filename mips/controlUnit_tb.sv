@@ -46,11 +46,11 @@ initial
 	begin
 		#4;
 		rst_i_tb = 1'b1;
-		op_i_tb = 6'h23;
+		op_i_tb = 6'h2b;
 		//funct_i_tb = 6'b100000;
 		
 		@(posedge clk_tb);
-		rst_i_tb = 1'b1 <= 1'b0;
+		rst_i_tb <= 1'b0;
 		
 		@(posedge clk_tb);
 		@(posedge clk_tb);
@@ -63,12 +63,12 @@ initial
 		@(posedge clk_tb);
 		
 		#4;
-		rst_i_tb = 1'b1;
+		//rst_i_tb = 1'b1;
 		op_i_tb = 6'b000000;
 		funct_i_tb = 6'b100010;
 		
 		@(posedge clk_tb);
-		rst_i_tb = 1'b1 <= 1'b0;
+		//rst_i_tb <= 1'b0;
 		
 		@(posedge clk_tb);
 		@(posedge clk_tb);
@@ -79,6 +79,8 @@ initial
 		@(posedge clk_tb);
 		@(posedge clk_tb);
 		@(posedge clk_tb);
+		
+		
 		
 	end
 	

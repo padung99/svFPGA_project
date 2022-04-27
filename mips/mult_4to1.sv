@@ -1,10 +1,10 @@
 module mult_4to1 (
-	input p00_i,
-	input p01_i,
-	input p10_i,
-	input p11_i,
-	input sel_i,
-	output res_o
+	input [31:0] p00_i,
+	input [31:0] p01_i,
+	input [31:0] p10_i,
+	input [31:0] p11_i,
+	input [1:0] sel_i,
+	output logic [31:0] res_o
 );
 
 always_comb

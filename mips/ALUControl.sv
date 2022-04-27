@@ -6,6 +6,7 @@ module ALUControl (
 
 always_comb
 	begin
+	aluControl_o = 3'bxxx;
 		case (ALUop_i)
 			2'b00: aluControl_o = 3'b010;
 			2'b01: aluControl_o = 3'b110;

@@ -1,8 +1,8 @@
 module mult_2to1 (
-	input p0_i,
-	input p1_i,
+	input [31:0] p0_i,
+	input [31:0] p1_i,
 	input sel_i,
-	output res_o
+	output logic [31:0] res_o
 );
 
 always_comb

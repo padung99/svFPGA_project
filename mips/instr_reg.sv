@@ -14,15 +14,15 @@ always_comb
 			instr_o = instr_data;
 		else
 			begin
-				if(IRWrite_i[0])
-					instr_data[0] =  instr8bit_i;
-				if(IRWrite_i[1])
-					instr_data[1] =  instr8bit_i;
-				if(IRWrite_i[2])
-					instr_data[2] =  instr8bit_i;
 				if(IRWrite_i[3])
+					instr_data[0] =  instr8bit_i;
+				if(IRWrite_i[2])
+					instr_data[1] =  instr8bit_i;
+				if(IRWrite_i[1])
+					instr_data[2] =  instr8bit_i;
+				if(IRWrite_i[0])
 					instr_data[3] =  instr8bit_i;
-				instr_o = 'x;
+				instr_o = instr_data;
 			end
 	end
 	
