@@ -151,6 +151,7 @@ always_comb
 					ALUOp  = 2'b00;
 					PCWrite  = 1'b0;
 					fetch_en  = 1'b1;
+					PCSrc  = 2'b11;
 					
 					if(op_i == 6'h0)
 						next_state = EXECUTION;
@@ -167,6 +168,7 @@ always_comb
 					ALUSrcA  = 1'b1;
 					ALUSrcB  = 2'b00;
 					ALUOp  = 2'b10;
+					PCSrc  = 2'b11;
 					
 					next_state = R_TYPE_COMPLETION;
 				end
@@ -176,6 +178,7 @@ always_comb
 					RegDst  = 1'b1;
 					RegWrite  = 1'b1;
 					MemtoReg  = 1'b0;
+					PCSrc  = 2'b11;
 					
 					next_state = RESET;
 				end
@@ -204,6 +207,7 @@ always_comb
 					ALUSrcA  = 1'b1;
 					ALUSrcB  = 2'b10;
 					ALUOp  = 2'b00;
+					PCSrc  = 2'b11;
 					
 					if(op_i == 6'h2b)
 						next_state = MEM_ACCESS_SW;
@@ -215,6 +219,7 @@ always_comb
 				begin
 					IorD  = 1'b1;
 					MemWrite  = 1'b1;
+					PCSrc  = 2'b11;
 					
 					next_state = RESET;
 				end
@@ -222,6 +227,7 @@ always_comb
 			MEM_ACCESS_LW:
 				begin
 					IorD  = 1'b1;
+					PCSrc  = 2'b11;
 					
 					next_state = WRITE_BACK;
 				end
@@ -231,6 +237,7 @@ always_comb
 					RegDst  = 1'b0;
 					RegWrite  = 1'b1;
 					MemtoReg = 1'b1;
+					PCSrc  = 2'b11;
 					
 					next_state = RESET;
 				end

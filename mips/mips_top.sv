@@ -20,7 +20,7 @@ bit RegDst;
 bit MemtoReg;
 
 //logic Adr;
-logic [31:0] instr, A, WriteData, srcA, srcB, ALUResult, ALUOut, PCNext, Data, WD3, Imm, Immx4, PC, Adr;
+logic [31:0] instr, A, WriteData, srcA, srcB, ALUResult, ALUOut, PCNext, Data, WD3, Imm, Immx4, PC, Adr, PCNext2;
 logic [3:0] MemData;
 bit Zero;
 logic [7:0] instr8bit_top;
@@ -132,9 +132,11 @@ mult_3to1 inst_mult_3to1_1(
 	.p00_i(ALUResult),
 	.p01_i(ALUOut),
 	.p10_i(Immx4),
+	.p11_i(PC),
 	.sel_i(PCSrc),
 	.res_o(PCNext)
 );
+
 
 mult_4to1 inst_mult_4to1(
 	.p00_i(WriteData),

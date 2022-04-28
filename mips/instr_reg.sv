@@ -25,7 +25,7 @@ always_comb
 				instr_o = instr_data;
 			end
 	end
-	
+
 endmodule
 
 
