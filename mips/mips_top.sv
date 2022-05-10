@@ -151,13 +151,7 @@ sign_extend inst_sign_extend(
 	.data_16bit_i(instr[15:0]),
 	.data_32bit_o(Imm)
 );
-//
-//ProgramCounter inst_ProgramCounter_2( //Using as register (DFF)
-//	.clk_i(clk_i_top),
-//	.en_i(1'b1),
-//	.addr_i(ALUResult),
-//	.addr_o(ALUOut)
-//);
+
 
 multiplyBy4 inst_multiplyBy4(
 	.Number_i(Imm),
