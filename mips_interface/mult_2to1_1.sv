@@ -6,7 +6,7 @@ module mult_2to1_1 (mips_top.mult_2to1_1 mult_2to1_1_if);
 //);
 
 always_comb
-	case (mult_2to1_1_if.sel_i)
+	case (mult_2to1_1_if.ALUSrcA)
 		1'b1: mult_2to1_1_if.srcA = mult_2to1_1_if.A;
 		1'b0: mult_2to1_1_if.srcA = mult_2to1_1_if.PC;
 	endcase

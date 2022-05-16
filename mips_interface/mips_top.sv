@@ -1,6 +1,6 @@
 interface mips_top(input clk_i_top);
 
-	bit fetch_en;
+	bit fetch_en, rst_i_top;
 	bit IorD;
 	bit MemWrite;
 	logic [3:0] IRWrite;
@@ -28,7 +28,8 @@ interface mips_top(input clk_i_top);
 	
 	modport controlUnit (
 		input  clk_i_top,
-				 instr,  	
+				 instr,
+				 rst_i_top,
 		output fetch_en,
 				 IorD,
 				 MemWrite,
@@ -50,8 +51,8 @@ interface mips_top(input clk_i_top);
 	);
 
 	modport instr_memory (
-		input  clk_i_top, MemWrite,
-		output Adr, WriteData, instr8bit_top
+		input  clk_i_top, MemWrite, Adr, WriteData,
+		output instr8bit_top
 	);
 
 	modport reg_file (
