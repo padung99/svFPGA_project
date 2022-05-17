@@ -5,5 +5,5 @@ if {[file exists rtl_work]} {
 vlib rtl_work
 vmap work rtl_work
 
-vlog -sv -work work +incdir+F:/YandexDisk/FPGAPRoject/fifo {F:/YandexDisk/FPGAPRoject/fifo/fifo.sv}
+vlog -sv -work work +incdir+E:/FPGAProject/fifo {E:/FPGAProject/fifo/fifo.sv}
 
