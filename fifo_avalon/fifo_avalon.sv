@@ -1,38 +1,28 @@
-module fifo_avalon ( avalon_interface.fifo_avalon avalon);
+module fifo_avalon #( 
+					parameter DATABITS_PER_SYMBOL  = 8,
+					parameter BEATS_PER_CYCLE 	  = 1,
+					parameter SYMBOLS_PER_BEAT     = 4,
+					parameter WIDTH 					  = SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL,
+					parameter DEPTH 					  = 8,
 
- localparam DATABITS_PER_SYMBOL  = 8;
- localparam BEATS_PER_CYCLE 	  = 1;
- localparam SYMBOLS_PER_BEAT     = 4;
- localparam WIDTH 					  = SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL;
- localparam DEPTH 					  = 8;
+					parameter READY_LATENCY		  = 0,
+					parameter READY_ALLOWANCE		  = 3
+					) ( interface avlif ) ;
 
- localparam READY_LATENCY		  = 0;
- localparam READY_ALLOWANCE		  = 3;
- 
-	avalon_interface		#(
-								.DATABITS_PER_SYMBOL( DATABITS_PER_SYMBOL ),
-								.BEATS_PER_CYCLE    ( BEATS_PER_CYCLE     ),
-								.SYMBOLS_PER_BEAT   ( SYMBOLS_PER_BEAT    ), 
-								.WIDTH 				  ( WIDTH 					),
-								.DEPTH 				  ( DEPTH					), //2^4 = 16 addresses
-								.READY_LATENCY		  ( READY_LATENCY			),
-								.READY_ALLOWANCE	  ( READY_ALLOWANCE		) 
-								) avlif( clk, rst );
 
 logic [DEPTH:0] 	rd_ptr;
 logic [DEPTH:0] 	wr_ptr;
-logic [WIDTH-1:0] mem [2**DEPTH-1:0];
+logic [WIDTH-1:0] 	mem [2**DEPTH-1:0];
 
 bit 					check;
 
 //Count how many clocks has been delayed.
 //when cnt_clk_latency = avlif.READY_LATENCY, fifo begin to send data (if valid = 1 and ready = 1)
-integer 				cnt_clk_latency = 0; 
-
+integer 				cnt_clk_latency; 
 
 always_ff @( posedge avlif.clk)
 	begin
-		if( cnt_clk_latency == avlif.READY_LATENCY )
+		if( cnt_clk_latency == avlif.READY_LATENCY - 1 )
 			check 				 <= 1;
 		if( !avlif.ready_rd )
 			begin
@@ -41,35 +31,65 @@ always_ff @( posedge avlif.clk)
 			end
 		if( avlif.ready_rd )
 				cnt_clk_latency <= cnt_clk_latency + 1;
-	end 
-					
-			
-always_ff @( posedge avlif.clk )
-	begin
-		if( avlif.rst )
+	end
+	
+	
+generate 	
+	if( READY_LATENCY >  0 )
+		always_ff @( posedge avlif.clk )
 			begin
-				rd_ptr 			 <= '0;
-				wr_ptr 			 <= '0;
+				if( avlif.rst )
+					begin
+						rd_ptr 			 <= '0;
+						wr_ptr 			 <= '0;
+					end
+				else
+					begin
+						if( check )
+							begin
+								if( avlif.valid_rd && avlif.ready_rd ) 
+									rd_ptr <= rd_ptr + 1;
+							end
+						
+						if( avlif.valid_wr && avlif.ready_wr )
+							wr_ptr <= wr_ptr + 1;
+					end
 			end
-		else
+	else
+		always_ff @( posedge avlif.clk )
 			begin
-				if( check )
+				if( avlif.rst )
+					begin
+						rd_ptr 			 <= '0;
+						wr_ptr 			 <= '0;
+					end
+				else
 					begin
 						if( avlif.valid_rd && avlif.ready_rd ) 
-							rd_ptr <= rd_ptr + 1;
+							rd_ptr 		 <= rd_ptr + 1;
+						
+						if( avlif.valid_wr && avlif.ready_wr )
+							wr_ptr 		 <= wr_ptr + 1;
 					end
-				if( avlif.valid_wr && avlif.ready_wr )
-					wr_ptr 		 <= wr_ptr + 1;
-			end
-	end
- 
-always_ff @( posedge avlif.clk )
-	if( check )
+			end		
+endgenerate		
+
+generate 
+	if( READY_LATENCY > 0 )
 		begin
+			always_ff @( posedge avlif.clk )
+				if( check )
+					begin
+						if( avlif.valid_rd && avlif.ready_rd )
+							avlif.data_rd 	<= mem[rd_ptr[DEPTH-1:0]];
+					end
+		end
+	else
+		always_ff @( posedge avlif.clk )
 			if( avlif.valid_rd && avlif.ready_rd )
 				avlif.data_rd 	<= mem[rd_ptr[DEPTH-1:0]];
-		end
-
+endgenerate
+ 		
 		
 always_ff @( posedge avlif.clk )
 	if( avlif.valid_wr && avlif.ready_wr )
