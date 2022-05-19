@@ -1,29 +1,29 @@
 interface avalon_interface #(
 	parameter DATABITS_PER_SYMBOL    = 8,
-	parameter BEATS_PER_CYCLE 	  	 = 1,
+	parameter BEATS_PER_CYCLE 	  	 	= 1,
 	parameter SYMBOLS_PER_BEAT       = 4, 
-	parameter WIDTH 				 = SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL,
-	parameter DEPTH 				 = 4, //2^4 = 16 addresses
+	parameter WIDTH 				 		= SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL,
+	parameter DEPTH 				 		= 4, //2^4 = 16 addresses
 	
-	parameter READY_LATENCY			 = 1,
-	parameter READY_ALLOWANCE		 = 2
+	parameter READY_LATENCY			 	= 1,
+	parameter READY_ALLOWANCE		 	= 2
 	) ( input bit clk, rst );
 	
-	localparam TEST_DATA					  = 20;
-	localparam TIMEOUT 					= 50;
+	localparam TEST_DATA			 		= 20;
+	localparam TIMEOUT 				 	= 50;
 	
 	// bit 				clk;
 	// bit 				rst;
 	
 	//Writing 
-	logic [WIDTH-1:0]  data_wr; //In writing mode, external device(src) ----> FIFO(sink)	
-	logic 			   ready_wr; // !full (sink --> src) 	
-	logic  			   valid_wr; // write_en (src --> sink)
+	logic [WIDTH-1:0]  data_wr; 	//In writing mode, external device(src) ----> FIFO(sink)	
+	logic 			    ready_wr;  //!full (sink --> src) 	
+	logic  			    valid_wr;  //write_en (src --> sink)
 	
 	//Reading 
-	logic [WIDTH-1:0]  data_rd; //In reading mode, FIFO(src) ----> ext device(sink)	
-	logic  			   ready_rd; // read_en (sink --> src)		
-	logic 			   valid_rd ;  // !empty (src --> sink)
+	logic [WIDTH-1:0]  data_rd; 	  //In reading mode, FIFO(src) ----> ext device(sink)	
+	logic  			    ready_rd; 	  //read_en (sink --> src)		
+	logic 			    valid_rd ;   //!empty (src --> sink)
 		
 	
 	default clocking cb
@@ -31,8 +31,8 @@ interface avalon_interface #(
 	endclocking
 	
 	modport fifo( input  data_wr , ready_wr, ready_rd, clk, rst,
-				  output valid_wr, data_rd , valid_rd
-				);
+				     output valid_wr, data_rd , valid_rd
+					);
 	
 	//---------------------------Generating numbers-----------------------	
 	task gen_data (input int test_cnt,
@@ -51,8 +51,8 @@ interface avalon_interface #(
 					
 	//----------------------------Writing task----------------------------
 	task wr_fifo ( mailbox #( logic [WIDTH-1:0] ) data, 
-				   mailbox #( logic [WIDTH-1:0] ) wr_data
-				  );
+						mailbox #( logic [WIDTH-1:0] ) wr_data
+					 );
 		
 		logic [WIDTH-1:0] data_wr_fifo;
 		int 				 pause_wr;
@@ -84,12 +84,11 @@ interface avalon_interface #(
 
 	//-----------------------------Reading task----------------------------
 	task rd_fifo ( mailbox #( logic [WIDTH-1:0] ) rd_from_fifo,
-				   int 							  empty_timeout
-				  );
+						int 							  	    empty_timeout
+					 );
 
 		logic [WIDTH-1:0] data_rd_fifo;
-		
-		int pause_rd;
+		int 				   pause_rd;
 		
 		forever
 			begin
@@ -101,9 +100,10 @@ interface avalon_interface #(
 						rd_from_fifo.put( data_rd );
 						$display( "[%0d] fifo read: %0d", rd_from_fifo.num(), data_rd );
 						
-						##(pause_rd); //When fifo is delaying, data_rd is still pushing out, when delay times is over, data_rd jumped to another value
+						//When fifo is delaying, data_rd is still pushing out, when delay times is over, data_rd jumped to another value
+						##(pause_rd); 
 						
-						ready_rd = 1'b0;	
+						ready_rd      = 1'b0;	
 						empty_timeout = 0;
 
 					end

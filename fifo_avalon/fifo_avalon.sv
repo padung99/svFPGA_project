@@ -1,24 +1,24 @@
 module fifo_avalon #( 
 					parameter DATABITS_PER_SYMBOL  = 8,
-					parameter BEATS_PER_CYCLE 	  = 1,
+					parameter BEATS_PER_CYCLE 	    = 1,
 					parameter SYMBOLS_PER_BEAT     = 4,
-					parameter WIDTH 					  = SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL,
-					parameter DEPTH 					  = 8,
+					parameter WIDTH 					 = SYMBOLS_PER_BEAT * DATABITS_PER_SYMBOL,
+					parameter DEPTH 					 = 8,
 
-					parameter READY_LATENCY		  = 0,
-					parameter READY_ALLOWANCE		  = 3
+					parameter READY_LATENCY		    = 0,
+					parameter READY_ALLOWANCE		 = 3
 					) ( interface avlif ) ;
 
 
-logic [DEPTH:0] 	rd_ptr;
-logic [DEPTH:0] 	wr_ptr;
+logic [DEPTH:0] 	   rd_ptr;
+logic [DEPTH:0] 	   wr_ptr;
 logic [WIDTH-1:0] 	mem [2**DEPTH-1:0];
 
-bit 					check;
+bit 						check;
 
 //Count how many clocks has been delayed.
 //when cnt_clk_latency = avlif.READY_LATENCY, fifo begin to send data (if valid = 1 and ready = 1)
-integer 				cnt_clk_latency; 
+integer 					cnt_clk_latency; 
 
 always_ff @( posedge avlif.clk)
 	begin
