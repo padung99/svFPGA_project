@@ -6,7 +6,7 @@ localparam SYMBOLS_PER_BEAT_TB     = 4;
 localparam WIDTH_TB 			   = SYMBOLS_PER_BEAT_TB * DATABITS_PER_SYMBOL_TB;
 localparam DEPTH_TB 			   = 4;
 
-localparam READY_LATENCY_TB		   = 0;
+localparam READY_LATENCY_TB		   = 2;
 localparam READY_ALLOWANCE_TB	   = 3;
 localparam TEST_DATA			   = 20;
 localparam TIMEOUT 				   = 50;
@@ -15,7 +15,7 @@ bit 	   clk_tb, rst_tb;
 initial
 	forever
 		#5 clk_tb = !clk_tb;
-	
+
 	default clocking cb
 	  @ (posedge clk_tb);
 	endclocking
