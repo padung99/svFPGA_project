@@ -1,17 +1,17 @@
 module fifo_tb;
 
 localparam DATABITS_PER_SYMBOL_TB  = 8;
-localparam BEATS_PER_CYCLE_TB 	   = 1;
+localparam BEATS_PER_CYCLE_TB      = 1;
 localparam SYMBOLS_PER_BEAT_TB     = 4;
-localparam WIDTH_TB 			   = SYMBOLS_PER_BEAT_TB * DATABITS_PER_SYMBOL_TB;
-localparam DEPTH_TB 			   = 4;
+localparam WIDTH_TB                = SYMBOLS_PER_BEAT_TB * DATABITS_PER_SYMBOL_TB;
+localparam DEPTH_TB                = 4;
 
-localparam READY_LATENCY_TB		   = 3;
-localparam READY_ALLOWANCE_TB	   = 3;
-localparam TEST_DATA			   = 20;
-localparam TIMEOUT 				   = 50;
+localparam READY_LATENCY_TB        = 3;
+localparam READY_ALLOWANCE_TB      = 3;
+localparam TEST_DATA               = 20;
+localparam TIMEOUT                 = 50;
 
-bit 	   clk_tb, rst_tb;
+bit        clk_tb, rst_tb;
 initial
     forever
         #5 clk_tb = !clk_tb;
@@ -26,8 +26,8 @@ initial
                 .DATABITS_PER_SYMBOL  ( DATABITS_PER_SYMBOL_TB ),
                 .BEATS_PER_CYCLE      ( BEATS_PER_CYCLE_TB     ),
                 .SYMBOLS_PER_BEAT     ( SYMBOLS_PER_BEAT_TB    ), 
-                .READY_LATENCY		  ( READY_LATENCY_TB	   ),
-                .READY_ALLOWANCE	  ( READY_ALLOWANCE_TB     ) 
+                .READY_LATENCY        ( READY_LATENCY_TB       ),
+                .READY_ALLOWANCE      ( READY_ALLOWANCE_TB     ) 
                 ) dut ( ast_fifo_tb.sink, ast_fifo_tb.source );
 
     
@@ -41,7 +41,7 @@ initial
     //Saving data received from module fifo
     mailbox #( logic [WIDTH_TB-1:0] ) rd_from_fifo  = new();
     
-    int 				 		      cnt_empty     = 0;
+    int                               cnt_empty     = 0;
 
 //---------------------------Generating numbers-----------------------	
     task gen_data (input int test_cnt,
@@ -59,15 +59,13 @@ initial
 
 
     //----------------------------Writing task----------------------------
-    task wr_fifo ( mailbox #( logic [WIDTH_TB-1:0] ) 	   data_task, 
-                   mailbox #( logic [WIDTH_TB-1:0] ) 	   wr_data,
+    task wr_fifo ( mailbox #( logic [WIDTH_TB-1:0] )       data_task, 
+                   mailbox #( logic [WIDTH_TB-1:0] )       wr_data,
                    virtual interface avalon_interface.sink ast_wr
-                //    logic							 valid_wr_t, ready_wr_t,
-                //    logic [WIDTH_TB-1:0]			  	 data_wr_t
                  );
         
         logic [WIDTH_TB-1:0] data_wr_fifo;
-        int 			  pause_wr;
+        int                  pause_wr;
         
         while( data_task.num() )
             begin
@@ -94,20 +92,20 @@ initial
 
 
     //-----------------------------Reading task----------------------------
-    task rd_fifo ( mailbox #( logic [WIDTH_TB-1:0] ) 		 rd_from_fifo,
-                   int 							  	 		 empty_timeout,
+    task rd_fifo ( mailbox #( logic [WIDTH_TB-1:0] )         rd_from_fifo,
+                   int                                       empty_timeout,
                    virtual interface avalon_interface.source ast_rd
                  );
 
         logic [WIDTH_TB-1:0] data_rd_fifo;
-        int 			  	 pause_rd;
+        int                  pause_rd;
         
         forever
             begin
                 // if( valid_rd )
                     begin 
                         pause_rd = $urandom_range(10,0);
-                        ast_rd.ready = 1'b1;		
+                        ast_rd.ready = 1'b1;
                         
                         // rd_from_fifo.put( data );
                         // $display( "[%0d] fifo read: %0d", rd_from_fifo.num(), data );
@@ -115,18 +113,18 @@ initial
                         //When fifo is delaying, data_rd is still pushing out, when delay times is over, data_rd jumped to another value
                         ##(pause_rd); 
                         
-                        ast_rd.ready      = 1'b0;	
+                        ast_rd.ready      = 1'b0;
                         empty_timeout = 0;
 
                     end
                 // else
-                // 	begin	
-                // 		if( empty_timeout == TIMEOUT )
-                // 			break;
-                // 		else
-                // 			empty_timeout++;
+                //  begin	
+                //      if( empty_timeout == TIMEOUT )
+                //          break;
+                //      else
+                //      empty_timeout++;
 
-                // 	end
+                //  end
                  ##1;
             end
         
@@ -138,7 +136,7 @@ initial
         #2;
         rst_tb   <= '1;
         #4;
-        rst_tb	 <= '0;
+        rst_tb   <= '0;
         
         gen_data   ( TEST_DATA, generate_data  );
         
