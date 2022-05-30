@@ -4,7 +4,7 @@ interface avalon_interface
     parameter BEATS_PER_CYCLE        = 1,
     parameter SYMBOLS_PER_BEAT       = 4, 
     
-    parameter READY_LATENCY          = 3,
+    parameter READY_LATENCY          = 2,
     parameter READY_ALLOWANCE        = 2
 )
     ( input bit clk, rst );

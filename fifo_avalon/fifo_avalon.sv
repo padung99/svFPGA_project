@@ -3,7 +3,7 @@ parameter DATABITS_PER_SYMBOL  = 8,
 parameter BEATS_PER_CYCLE      = 1,
 parameter SYMBOLS_PER_BEAT     = 4,
 
-parameter READY_LATENCY        = 3,
+parameter READY_LATENCY        = 2,
 parameter READY_ALLOWANCE      = 3
 ) (
 avalon_interface.sink          ast_wr_if,
@@ -25,7 +25,7 @@ fifo #(
     .DEPTH                 ( DEPTH               )
     ) fifo_inst (
     .clk_i                 ( ast_wr_if.clk       ),
-    .rst_i                 ( ast_wr_if.rst       ),
+    .rst_i                 ( ast_wr_if.rst       ),     
 
     .data_i                ( ast_wr_if.data      ), //write
     .rd_i                  ( ast_rd_if.ready     ), //read
@@ -33,7 +33,7 @@ fifo #(
 
     .wr_i                  ( ast_wr_if.valid     ), //write
     .non_empty_o           ( ast_rd_if.valid     ), //read
-    .non_full_o	           ( ast_wr_if.ready     )  //write
+    .non_full_o            ( ast_wr_if.ready     )  //write
     );
 
 endmodule

@@ -3,7 +3,7 @@ parameter DATABITS_PER_SYMBOL    = 8,
 parameter BEATS_PER_CYCLE        = 1,
 parameter SYMBOLS_PER_BEAT       = 4,
 
-parameter READY_LATENCY          = 3,
+parameter READY_LATENCY          = 2,
 parameter READY_ALLOWANCE        = 3,
 
 parameter WIDTH                  = DATABITS_PER_SYMBOL*SYMBOLS_PER_BEAT,
@@ -21,7 +21,6 @@ output logic                     non_empty_o,
 output logic                     non_full_o
 ) ;
 
-
 logic [DEPTH:0]                  rd_ptr;
 logic [DEPTH:0]                  wr_ptr;
 logic [2**DEPTH-1:0] [WIDTH-1:0] mem;
@@ -31,44 +30,69 @@ bit                              ready_cycle_wr;
 bit                              flag_wr;
 bit                              flag_rd;
 logic                            empty; //read
-logic                            full; //write
-logic                            pos, neg;
-logic                            pos_o, neg_o;
+logic                            full;  //write
+logic                            pos_wr, neg_wr;
+logic                            pos_rd, neg_rd;
+logic                            wr_pos_edge_detect, wr_neg_edge_detect;
+logic                            rd_pos_edge_detect, rd_neg_edge_detect;
 
 //Count how many clocks have been delayed.
-//when cnt_clk_latency_rd = avlif.READY_LATENCY, fifo begin to send data (if valid = 1 and ready = 1)
-int                              cnt_clk_latency_rd; 
+//when cnt_clk_latency_rd = READY_LATENCY, fifo begins to send data
+int                              cnt_clk_latency_rd;
 int                              cnt_clk_latency_wr;
 
+//--------------------Find ready cycle on writing task---------------------
 always_ff @( posedge clk_i )
-    begin
-        pos_o <= wr_i;  //q_pos
-        neg_o <= !wr_i; //q_neg
-    end
+   begin
+       pos_wr <=  wr_i;  //q_pos
+       neg_wr <= !wr_i; //q_neg
+   end
 
-assign pos    = wr_i && !pos_o;  //detecting positive edge wr_i
-assign neg    = !wr_i && !neg_o; //detecting negative edge wr_i
+assign wr_pos_edge_detect    =  wr_i && !pos_wr;  //detecting positive edge wr_i
+assign wr_neg_edge_detect    = !wr_i && !neg_wr; //detecting negative edge wr_i
 
-always_ff @( posedge pos )
-    begin
+always_ff @( posedge clk_i )
+    if( wr_pos_edge_detect )
         flag_wr <= 1;
-        flag_rd <= 1;
-    end
 
-always_ff @( posedge neg )
-    begin
-        if( cnt_clk_latency_wr >= READY_LATENCY - 1)
-            begin
-                flag_wr                <= 0;
-                ready_cycle_wr         <= 0;
-                flag_rd                <= 0;
-                ready_cycle_rd         <= 0;
-            end
-    end
+
+always_ff @( posedge clk_i )
+    if( wr_neg_edge_detect )
+        begin
+            if( cnt_clk_latency_wr > READY_LATENCY - 1)
+                begin
+                    flag_wr                <= 0;
+                    ready_cycle_wr         <= 0;
+                end
+        end
+
+//--------------------Find ready cycle on reading task---------------------
+always_ff @( posedge clk_i )
+   begin
+       pos_rd <=  rd_i;
+       neg_rd <= !rd_i;
+   end
+
+assign rd_pos_edge_detect    =  rd_i && !pos_rd;  //detecting positive edge rd_i
+assign rd_neg_edge_detect    = !rd_i && !neg_rd;  //detecting negative edge rd_i
+
+always_ff @( posedge clk_i )
+    if( rd_pos_edge_detect )
+        flag_rd <= 1;
+
+always_ff @( posedge clk_i )
+    if( rd_neg_edge_detect )
+        begin
+            if( cnt_clk_latency_wr > READY_LATENCY - 1)
+                begin
+                    flag_rd                <= 0;
+                    ready_cycle_rd         <= 0;
+                end
+        end
 
 always_ff @( posedge clk_i )
     begin
-    //--------------Check ready cycle in reading task-------------------
+    //---------------Check ready cycle in reading task-------------------
         if( flag_rd )
             cnt_clk_latency_rd <= cnt_clk_latency_rd + 1;
         else
@@ -79,7 +103,7 @@ always_ff @( posedge clk_i )
                 ready_cycle_rd <= 1;
             end
     
-    //----------------Check ready cycle on writing task---------------
+    //----------------Check ready cycle in writing task---------------
         if( flag_wr )
             cnt_clk_latency_wr <= cnt_clk_latency_wr + 1;
         else
@@ -112,10 +136,10 @@ generate
                 end
             
             
-            assign full = ( ( rd_ptr[DEPTH-1:0] == wr_ptr[DEPTH-1:0] ) &&
-                            ( rd_ptr[DEPTH] != wr_ptr[DEPTH] ) ) ? 1 : 0; //full
+            assign full  = (( rd_ptr[DEPTH-1:0] == wr_ptr[DEPTH-1:0] ) &&
+                            ( rd_ptr[DEPTH]     != wr_ptr[DEPTH]     )) ? 1 : 0; //full
 
-            assign empty = ( ( rd_ptr == wr_ptr ) ) ? 1 : 0; //empty
+            assign empty = (( rd_ptr            == wr_ptr            )) ? 1 : 0; //empty
 
             always_ff @( posedge clk_i )
                 if( non_empty_o && rd_i )
@@ -125,9 +149,8 @@ generate
                 if( non_full_o && wr_i )
                     mem[wr_ptr[DEPTH-1:0]] <= data_i;
 
-            //always_ff @( posedge avlif.clk )
             assign non_empty_o = !empty & ready_cycle_rd;
-            assign non_full_o = !full & ready_cycle_wr;
+            assign non_full_o  = !full & ready_cycle_wr;
         
         end
     else
@@ -151,17 +174,17 @@ generate
 
             always_ff @( posedge clk_i ) 
                 if( !empty && rd_i )
-                    data_o                 <= mem[rd_ptr[DEPTH-1:0]];
+                    data_o                   <= mem[rd_ptr[DEPTH-1:0]];
 
             always_ff @( posedge clk_i )
                 if( !full && wr_i )
-                    mem[wr_ptr[DEPTH-1:0]] <= data_i;
+                    mem[wr_ptr[DEPTH-1:0]]   <= data_i;
 
-            //always_ff @( posedge avlif.clk )
-            assign empty = ( ( rd_ptr == wr_ptr ) ) ? 1 : 0; //empty
+            
+            assign empty = (( rd_ptr            == wr_ptr            )) ? 1 : 0; //empty
 
-            assign full = ( ( rd_ptr[DEPTH-1:0] == wr_ptr[DEPTH-1:0] ) &&
-                              ( rd_ptr[DEPTH] != wr_ptr[DEPTH] ) ) ? 1 : 0; //full
+            assign full  = (( rd_ptr[DEPTH-1:0] == wr_ptr[DEPTH-1:0] ) &&
+                            ( rd_ptr[DEPTH]     != wr_ptr[DEPTH]    )) ? 1 : 0; //full
             
             assign non_empty_o = !empty;
             assign non_full_o  = !full;
@@ -170,4 +193,3 @@ generate
 endgenerate
 
 endmodule
-
