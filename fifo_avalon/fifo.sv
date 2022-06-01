@@ -23,7 +23,7 @@ output logic                     non_full_o
 
 logic [DEPTH:0]                  rd_ptr;
 logic [DEPTH:0]                  wr_ptr;
-logic [2**DEPTH-1:0] [WIDTH-1:0] mem;
+logic [WIDTH-1:0]    mem  [2**DEPTH-1:0] ;
 
 bit                              ready_cycle_rd;
 bit                              ready_cycle_wr;
